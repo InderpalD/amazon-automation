@@ -45,6 +45,57 @@ class amazon(object):
 
 			time.sleep(3)
 
+			first_result = self.driver.find_element_by_id("result_0")
+			asin = first_result.get_attribute("data-asin")
+			product_url = "https://www.amazon.com/dp/" + asin
+			price = self.get_product_price(product_url)
+			name = self.get_product_name(product_url)
+
+			prices.append(price)
+			names.append(name)
+			urls.append(product_url)
+
+			print(name, price, product_url)
+
+			time.sleep(3)
+
+		return prices, urls, names
+
+	def get_product_price(self, url):
+		self.driver.get(url)
+		try:
+			price = self.driver.find_element_by_id("priceblock_ourprice")
+		except:
+			pass
+
+		try:
+			price = self.driver.find_element_by_id("priceblock_dealprice")
+		except:
+			pass
+		
+
+		if price is None:
+			price = "Not Available"
+
+		else:
+			non_decimal = re.compile(r'[^\d.]+')
+			price = non_decimal.sub('', price)
+
+		return price
+
+
+	def get_product_name(self, url):
+		self.driver.get(url)
+		try:
+			product_name = self.driver.find_element_by_id("productTitle")
+		except:
+			pass
+
+		if product_name is None:
+			product_name = "Not available"
+
+		return product_name
+
 
 items = ['toothpaste']
 amazon = amazon(items)
@@ -56,7 +107,3 @@ amazon.search_items()
 
 		
 		
-		
-		
-
-
